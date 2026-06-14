@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>邀请函</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#c9a96e;--gold-light:#e8d5a8;--dark:#1a1208;--dark2:#2a1f10;--red:#b22222;--bg:#0f0a04;--card:#1e150a;--text:#f0e6d3;--muted:#8a7a62;--border:#3a2e1e}
+body{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;justify-content:center;padding:12px;-webkit-font-smoothing:antialiased}
+
+/* ===== Container ===== */
+.invite-wrapper{width:100%;max-width:390px;display:flex;flex-direction:column;gap:0}
+
+/* ===== Card ===== */
+.invite-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;position:relative}
+
+/* Top ornament */
+.card-top{position:relative;height:8px;background:linear-gradient(90deg,var(--gold),var(--gold-light),var(--gold))}
+.card-top::after{content:'';position:absolute;left:50%;top:0;transform:translateX(-50%);width:60px;height:3px;background:var(--gold-light);border-radius:0 0 3px 3px}
+
+/* Header */
+.card-header{padding:28px 24px 16px;text-align:center;border-bottom:1px solid var(--border)}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}
+.logo-line{width:32px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+.logo-line:last-child{background:linear-gradient(90deg,var(--gold),transparent)}
+.logo-mark{color:var(--gold);font-size:11px;letter-spacing:4px;font-weight:600}
+.card-header h1{font-size:18px;color:var(--gold);letter-spacing:6px;font-weight:600;margin-bottom:6px}
+.card-header .sub{font-size:12px;color:var(--muted);letter-spacing:2px}
+
+/* Body */
+.card-body{padding:20px 24px 16px}
+
+/* Guest info */
+.guest-section{text-align:center;margin-bottom:18px}
+.guest-name{font-size:26px;color:var(--gold-light);font-weight:700;letter-spacing:4px;margin-bottom:4px}
+.guest-company{font-size:13px;color:var(--muted);letter-spacing:1px}
+
+/* Divider */
+.divider{display:flex;align-items:center;gap:10px;margin:16px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)}
+.divider span{font-size:10px;color:var(--muted);letter-spacing:3px}
+
+/* Event info */
+.event-info{font-size:13px;line-height:2;color:var(--text)}
+.event-info .label{color:var(--muted);margin-right:8px}
+.event-info .val{color:var(--gold-light)}
+.event-note{margin-top:14px;font-size:12px;color:var(--muted);text-align:center;line-height:1.6}
+
+/* ===== QR Section ===== */
+.qr-section{display:flex;flex-direction:column;align-items:center;padding:18px 24px 22px;position:relative}
+.qr-wrapper{position:relative;width:220px;height:220px;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:12px;padding:12px}
+.qr-wrapper canvas,.qr-wrapper svg,.qr-wrapper img{width:196px!important;height:196px!important;display:block!important}
+.qr-status{margin-top:12px;padding:6px 18px;border-radius:20px;font-size:13px;font-weight:500}
+.qr-status.valid{background:rgba(40,120,40,.15);border:1px solid #2a6020;color:#6aaa50}
+.qr-status.used{background:rgba(178,34,34,.15);border:1px solid #5a2020;color:#e06060}
+
+/* Gray overlay for used state */
+.qr-used-overlay{position:absolute;inset:0;background:rgba(120,120,120,.45);border-radius:12px;display:none;align-items:center;justify-content:center;z-index:10}
+.qr-used-overlay .stamp{font-size:26px;color:#b22222;font-weight:900;transform:rotate(-18deg);text-shadow:0 0 10px rgba(178,34,34,.5);letter-spacing:6px;border:3px solid #b22222;border-radius:12px;padding:6px 18px;background:rgba(178,34,34,.12)}
+
+/* Footer */
+.card-footer{padding:14px 24px 18px;text-align:center;border-top:1px solid var(--border)}
+.card-footer .footer-text{font-size:11px;color:var(--muted);letter-spacing:1px}
+.card-footer .footer-brand{font-size:11px;color:var(--gold);margin-top:4px;letter-spacing:2px}
+
+/* ===== Loading / Error ===== */
+#loadingPage,#errorPage{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;text-align:center;padding:32px}
+.loading-spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-icon{font-size:48px;margin-bottom:16px}
+.error-text{font-size:15px;color:var(--muted);line-height:1.6}
+
+/* ===== Responsive ===== */
+@media(min-width:400px){
+  body{padding:24px 12px}
+  .invite-card{border-radius:18px}
+}
+</style>
+</head>
+<body>
+
+<div id="loadingPage">
+  <div class="loading-spinner"></div>
+  <div style="color:var(--muted);font-size:14px">加载邀请函...</div>
+</div>
+
+<div id="errorPage" style="display:none">
+  <div class="error-icon">📄</div>
+  <div class="error-text">邀请函不存在或已失效<br>请确认链接是否正确</div>
+</div>
+
+<div class="invite-wrapper" id="invitePage" style="display:none">
+  <div class="invite-card">
+    <div class="card-top"></div>
+    <div class="card-header">
+      <div class="logo-row">
+        <div class="logo-line"></div>
+        <div class="logo-mark">黄金酱酒</div>
+        <div class="logo-line"></div>
+      </div>
+      <h1>诚挚邀请</h1>
+      <div class="sub">流金之夜 · 品鉴会</div>
+    </div>
+
+    <div class="card-body">
+      <div class="guest-section">
+        <div class="guest-name" id="guestName">—</div>
+        <div class="guest-company" id="guestCompany"></div>
+      </div>
+
+      <div class="divider"><span>邀请详情</span></div>
+
+      <div class="event-info">
+        <div><span class="label">活动名称：</span><span class="val">"流金之夜" 专属品鉴会</span></div>
+        <div><span class="label">活动时间：</span><span class="val">2026年6月18日 19:00</span></div>
+        <div><span class="label">活动地点：</span><span class="val">南充万达广场 黄金酱酒旗舰店</span></div>
+        <div><span class="label">席位限定：</span><span class="val">30席（敬请凭函入场）</span></div>
+      </div>
+      <div class="event-note">春风有信，花开有期<br>诚邀阁下莅临品鉴，共赴流金之夜</div>
+    </div>
+
+    <div class="qr-section">
+      <div class="qr-wrapper" id="qrContainer">
+        <div class="qr-used-overlay" id="qrOverlay">
+          <div class="stamp">已核销</div>
+        </div>
+      </div>
+      <div class="qr-status" id="qrStatus">待核验 · 请向工作人员出示此码</div>
+    </div>
+
+    <div class="card-footer">
+      <div class="footer-text">— 黄金酱酒 · 静候光临 —</div>
+      <div class="footer-brand">HUANGJIN JIANGJIU</div>
+    </div>
+  </div>
+</div>
+
+<!-- qrcode-generator (SVG rendering) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+
+<script>
+let inviteId = '';
+let pollTimer = null;
+let currentUsed = false;
+
+function init() {
+  const params = new URLSearchParams(window.location.search);
+  inviteId = params.get('id');
+  if (!inviteId) return showError();
+
+  loadInvite();
+  // Poll every 3 seconds for verification status
+  pollTimer = setInterval(loadInvite, 3000);
+}
+
+async function loadInvite() {
+  // Demo mode: show static content without API
+  if (inviteId === 'demo') {
+    renderInvite({
+      id: 'HJDEMO',
+      name: '尊贵嘉宾',
+      company: '演示公司',
+      used: false,
+      usedAt: null
+    });
+    document.getElementById('loadingPage').style.display = 'none';
+    document.getElementById('invitePage').style.display = 'flex';
+    return;
+  }
+  try {
+    const r = await fetch(`/api/invites/${encodeURIComponent(inviteId)}`);
+    if (!r.ok) return showError();
+    const data = await r.json();
+    if (data.error) return showError();
+    renderInvite(data);
+  } catch(e) {
+    // Network error — will retry on next poll
+  }
+}
+
+function renderInvite(data) {
+  // Show page if hidden
+  document.getElementById('loadingPage').style.display = 'none';
+  document.getElementById('invitePage').style.display = 'flex';
+
+  // Guest name + company
+  document.getElementById('guestName').textContent = data.name;
+  document.getElementById('guestCompany').textContent = data.company || '';
+
+  // QR code (only render once)
+  if (!window.__qrRendered) {
+    renderQR(data.id);
+    window.__qrRendered = true;
+  }
+
+  // Verification status
+  if (data.used && !currentUsed) {
+    // Just got verified!
+    currentUsed = true;
+    showVerifiedState();
+  } else if (data.used) {
+    // Already verified (page load)
+    currentUsed = true;
+    showVerifiedState();
+  }
+  // If not used, do nothing (keep "待核验" state)
+}
+
+function showVerifiedState() {
+  // Gray overlay
+  document.getElementById('qrOverlay').style.display = 'flex';
+  // Status label
+  const st = document.getElementById('qrStatus');
+  st.className = 'qr-status used';
+  st.textContent = '已核销 · 礼品已领取';
+  // Stop polling
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+}
+
+function renderQR(text) {
+  const container = document.getElementById('qrContainer');
+  // Use qrcode-generator SVG (crisp at any DPI)
+  if (typeof qrcode === 'function') {
+    try {
+      const qr = qrcode(0, 'H');  // H = 30% recovery
+      qr.addData(text);
+      qr.make();
+      container.innerHTML = qr.createSvgTag(6);  // cell size 6px → 174px total
+      // Style the SVG
+      const svg = container.querySelector('svg');
+      if (svg) {
+        svg.style.width = '196px';
+        svg.style.height = '196px';
+        svg.style.display = 'block';
+      }
+      // Add overlay container back
+      const overlay = document.createElement('div');
+      overlay.className = 'qr-used-overlay';
+      overlay.id = 'qrOverlay';
+      overlay.innerHTML = '<div class="stamp">已核销</div>';
+      container.appendChild(overlay);
+      return;
+    } catch(e) { console.warn('QR SVG failed:', e); }
+  }
+  // Fallback: show invite code as text
+  container.innerHTML = '';
+  const fb = document.createElement('div');
+  fb.style.cssText = 'padding:20px;text-align:center;color:var(--gold);font-size:18px;letter-spacing:4px;font-weight:600';
+  fb.textContent = text;
+  container.appendChild(fb);
+  const overlay = document.createElement('div');
+  overlay.className = 'qr-used-overlay';
+  overlay.id = 'qrOverlay';
+  overlay.innerHTML = '<div class="stamp">已核销</div>';
+  container.appendChild(overlay);
+}
+
+function showError() {
+  document.getElementById('loadingPage').style.display = 'none';
+  document.getElementById('errorPage').style.display = 'flex';
+}
+
+// Init
+init();
+</script>
+</body>
+</html>
