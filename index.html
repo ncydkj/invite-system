@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>黄金酱酒 · 邀请函系统</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#c9a96e;--gold-light:#e8d5a8;--dark:#1a1208;--bg:#0f0a04;--card:#1e150a;--text:#f0e6d3;--muted:#8a7a62;--border:#3a2e1e}
+body{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased}
+.container{width:100%;max-width:420px;text-align:center}
+h1{font-size:24px;color:var(--gold);margin-bottom:8px;letter-spacing:4px}
+.subtitle{font-size:13px;color:var(--muted);margin-bottom:40px;letter-spacing:2px}
+.links{display:flex;flex-direction:column;gap:16px}
+.link-card{display:block;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px 20px;text-decoration:none;transition:border-color .2s,transform .1s}
+.link-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.link-card:active{transform:scale(.98)}
+.link-card h2{font-size:17px;color:var(--gold-light);margin-bottom:6px}
+.link-card p{font-size:12px;color:var(--muted);line-height:1.5}
+.icon{font-size:28px;margin-bottom:8px}
+.footer{margin-top:40px;font-size:11px;color:var(--muted);letter-spacing:1px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>黄金酱酒</h1>
+  <div class="subtitle">流金之夜 · 品鉴会 邀请函系统</div>
+  <div class="links">
+    <a class="link-card" href="admin.html">
+      <div class="icon">⚙️</div>
+      <h2>管理后台</h2>
+      <p>生成邀请函 · 扫码核销 · 管理嘉宾</p>
+    </a>
+    <a class="link-card" href="invite.html?id=demo">
+      <div class="icon">🎫</div>
+      <h2>邀请函预览</h2>
+      <p>查看邀请函展示效果（演示模式）</p>
+    </a>
+  </div>
+  <div class="footer">黄金酱酒 · 南充</div>
+</div>
+</body>
+</html>
