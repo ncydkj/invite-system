@@ -164,25 +164,73 @@ a{color:var(--gold);text-decoration:none}
 const R_URL = 'https://arriving-buck-124112.upstash.io';
 const R_TOK = 'gQAAAAAAAeTQAAIgcDI4NmZiZGVkZTQzMzI0MDcwYjAxMjZhOTE1MTc3MTA0MA';
 
-async function redis(path) {
-  const r = await fetch(R_URL + path, {
+// Robust redis GET (all reads use GET)
+async function redisGet(path) {
+  const url = R_URL + path;
+  const r = await fetch(url, {
+    method: 'GET',
     headers: { Authorization: 'Bearer ' + R_TOK }
   });
   const j = await r.json();
-  // Auto-parse JSON strings
+  console.log('[redisGet]', path, j);
   if (typeof j.result === 'string') {
     try { return JSON.parse(j.result); } catch { return j.result; }
   }
   return j.result;
 }
 
+// Robust redis SET via POST (avoids URL encoding issues)
 async function redisSet(key, value) {
-  const encoded = encodeURIComponent(JSON.stringify(value));
-  return redis('/set/' + key + '/' + encoded);
+  const url = R_URL + '/set/' + key;
+  const body = new URLSearchParams();
+  body.append('value', JSON.stringify(value));
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: 'Bearer ' + R_TOK,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: body
+  });
+  const j = await r.json();
+  console.log('[redisSet]', key, j);
+  return j.result;
+}
+
+// redis SADD (set add)
+async function redisSAdd(key, member) {
+  const url = R_URL + '/sadd/' + key + '/' + encodeURIComponent(member);
+  const r = await fetch(url, {
+    method: 'GET',
+    headers: { Authorization: 'Bearer ' + R_TOK }
+  });
+  const j = await r.json();
+  console.log('[redisSAdd]', key, member, j);
+  return j.result;
+}
+
+// redis DEL
+async function redisDel(key) {
+  const url = R_URL + '/del/' + key;
+  const r = await fetch(url, {
+    method: 'GET',
+    headers: { Authorization: 'Bearer ' + R_TOK }
+  });
+  return (await r.json()).result;
+}
+
+// redis SREM (set remove)
+async function redisSRem(key, member) {
+  const url = R_URL + '/srem/' + key + '/' + encodeURIComponent(member);
+  const r = await fetch(url, {
+    method: 'GET',
+    headers: { Authorization: 'Bearer ' + R_TOK }
+  });
+  return (await r.json()).result;
 }
 
 // ===== State =====
-let html5QrCode = null;
+let html5Qrcode = null;
 let scanning = false;
 
 // ===== Auth =====
@@ -226,10 +274,10 @@ function genId() {
 // ===== CRUD =====
 async function refreshList() {
   try {
-    const keys = await redis('/smembers/invite:all') || [];
+    const keys = await redisGet('/smembers/invite:all') || [];
     const items = [];
     for (const k of keys) {
-      const data = await redis('/get/invite:' + k);
+      const data = await redisGet('/get/invite:' + k);
       if (data) items.push(data);
     }
     items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -305,23 +353,26 @@ async function createInvite() {
   const invite = { id, name, company, createdAt: new Date().toISOString(), used: false, usedAt: null };
 
   try {
-    await redisSet('invite:' + id, invite);
-    await redis('/sadd/invite:all/' + id);
+    // Save invite object
+    const setResult = await redisSet('invite:' + id, invite);
+    console.log('[createInvite] setResult:', setResult);
+    // Add to all set
+    await redisSAdd('invite:all', id);
     document.getElementById('inputName').value = '';
     document.getElementById('inputCompany').value = '';
     showToast(`✅ 已生成：${id} · ${name}`);
     refreshList();
   } catch(e) {
+    console.error('[createInvite] error:', e);
     showToast('创建失败，请重试');
-    console.error(e);
   }
 }
 
 async function deleteInvite(id) {
   if (!confirm(`确认删除邀请函 ${id}？`)) return;
   try {
-    await redis('/del/invite:' + id);
-    await redis('/srem/invite:all/' + id);
+    await redisDel('invite:' + id);
+    await redisSRem('invite:all', id);
     showToast('已删除');
     refreshList();
   } catch(e) {
@@ -330,7 +381,7 @@ async function deleteInvite(id) {
 }
 
 function copyLink(id) {
-  const url = `${window.location.origin}/invite.html?id=${id}`;
+  const url = window.location.origin + '/invite.html?id=' + id;
   if (navigator.clipboard) {
     navigator.clipboard.writeText(url).then(() => showToast('✅ 链接已复制'));
   } else {
@@ -356,13 +407,13 @@ function closeScan() {
 }
 
 function startScan() {
-  if (html5QrCode) {
-    try { html5QrCode.stop().catch(() => {}); } catch(e) {}
+  if (html5Qrcode) {
+    try { html5Qrcode.stop().catch(() => {}); } catch(e) {}
   }
-  html5QrCode = new Html5Qrcode('reader');
+  html5Qrcode = new Html5Qrcode('reader');
   const config = { fps: 15, qrbox: { width: 260, height: 260 }, aspectRatio: 1.0 };
 
-  html5QrCode.start(
+  html5Qrcode.start(
     { facingMode: 'environment' },
     config,
     onScanSuccess,
@@ -370,24 +421,22 @@ function startScan() {
   ).then(() => {
     scanning = true;
     try {
-      const track = html5QrCode.getRunningTrackCameraCapabilities();
+      const track = html5Qrcode.getRunningTrackCameraCapabilities();
       if (track && track.torchFeature && track.torchFeature.isSupported()) {
         track.torchFeature.enable(true).catch(() => {});
       }
     } catch(e) {}
   }).catch(err => {
     document.getElementById('scanResult').style.display = 'block';
-    document.getElementById('scanResult').className = '';
-    document.getElementById('scanResult').style.background = 'rgba(178,34,34,.15)';
-    document.getElementById('scanResult').style.border = '1px solid var(--red)';
-    document.getElementById('scanResult').style.color = '#e06060';
-    document.getElementById('scanResult').textContent = '摄像头不可用，请使用手动输入';
+    const el = document.getElementById('scanResult');
+    el.className = 'error';
+    el.textContent = '摄像头不可用，请使用手动输入';
   });
 }
 
 function stopScan() {
-  if (html5QrCode && scanning) {
-    try { html5QrCode.stop().catch(() => {}); } catch(e) {}
+  if (html5Qrcode && scanning) {
+    try { html5Qrcode.stop().catch(() => {}); } catch(e) {}
     scanning = false;
   }
 }
@@ -400,13 +449,10 @@ async function onScanSuccess(decodedText) {
     const paramId = urlObj.searchParams.get('id');
     if (paramId) inviteId = paramId;
   } catch(e) {}
-  // Validate format
   if (!/^HJ[A-HJ-NP-Z2-9]{4}$/i.test(inviteId)) {
     const el = document.getElementById('scanResult');
     el.style.display = 'block';
-    el.style.background = 'rgba(178,34,34,.15)';
-    el.style.border = '1px solid var(--red)';
-    el.style.color = '#e06060';
+    el.className = 'error';
     el.textContent = '✕ 无效邀请码格式';
     return;
   }
@@ -425,22 +471,16 @@ async function doVerify(inviteId) {
   el.style.display = 'block';
 
   try {
-    const invite = await redis('/get/invite:' + inviteId);
+    const invite = await redisGet('/get/invite:' + inviteId);
 
     if (!invite) {
-      el.className = '';
-      el.style.background = 'rgba(178,34,34,.15)';
-      el.style.border = '1px solid var(--red)';
-      el.style.color = '#e06060';
+      el.className = 'error';
       el.textContent = '✕ 无效邀请码，请检查后重试';
       return;
     }
 
     if (invite.used) {
-      el.className = '';
-      el.style.background = 'rgba(178,34,34,.15)';
-      el.style.border = '1px solid var(--red)';
-      el.style.color = '#e06060';
+      el.className = 'error';
       el.innerHTML = `✕ 该邀请函已核销<br><small style="opacity:.7">核销时间：${escHtml(invite.usedAt || '')}</small>`;
       return;
     }
@@ -450,20 +490,14 @@ async function doVerify(inviteId) {
     invite.usedAt = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
     await redisSet('invite:' + inviteId, invite);
 
-    el.className = '';
-    el.style.background = 'rgba(45,106,46,.15)';
-    el.style.border = '1px solid var(--green)';
-    el.style.color = '#6aaa50';
+    el.className = 'success';
     el.innerHTML = `✅ 核销成功！<br><strong style="font-size:18px;letter-spacing:3px">${escHtml(invite.name)}</strong> 可领取礼品`;
 
     refreshList();
   } catch(e) {
-    el.className = '';
-    el.style.background = 'rgba(178,34,34,.15)';
-    el.style.border = '1px solid var(--red)';
-    el.style.color = '#e06060';
+    console.error('[doVerify] error:', e);
+    el.className = 'error';
     el.textContent = '网络错误，请重试';
-    console.error(e);
   }
 }
 
