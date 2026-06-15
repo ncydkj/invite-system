@@ -343,7 +343,14 @@ const R_TOK = 'gQAAAAAAAeTQAAIgcDI4NmZiZGVkZTQzMzI0MDcwYjAxMjZhOTE1MTc3MTA0MA';
 async function redis(path){
   const r = await fetch(R_URL+path,{headers:{Authorization:'Bearer '+R_TOK}});
   const j = await r.json();
-  if(typeof j.result==='string'){try{return JSON.parse(j.result);}catch{return j.result;}}
+  if(typeof j.result==='string'){
+    // Handle dirty data: "value=%7B..." from old URLSearchParams writes
+    let raw=j.result;
+    if(raw.startsWith('value=')){
+      try{raw=decodeURIComponent(raw.slice(6));}catch{}
+    }
+    try{return JSON.parse(raw);}catch{return raw;}
+  }
   return j.result;
 }
 
@@ -383,9 +390,10 @@ async function loadInvite(){
   }
   try{
     const data=await redis('/get/invite:'+encodeURIComponent(inviteId));
-    if(!data)return showError();
+    console.log('[loadInvite] id:',inviteId,'data:',data);
+    if(!data||typeof data!=='object')return showError();
     renderInvite(data);
-  }catch(e){console.warn('loadInvite error:',e);}
+  }catch(e){console.error('loadInvite error:',e);showError();}
 }
 
 function renderInvite(data){
