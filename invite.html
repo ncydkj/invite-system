@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>黄金酱酒·流金之夜 邀请函</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#c9a96e;--gold-light:#e8d5a8;--gold-dark:#a07d40;
+  --dark:#1a1208;--bg:#0c0804;--card:#151008;
+  --text:#f0e6d3;--muted:#9a8a70;--border:#2e2416;
+  --red:#b22222;--red-light:#e05555;
+}
+
+body{
+  font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;justify-content:center;
+  padding:12px;-webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* ===== 背景粒子 ===== */
+.bg-particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bg-particles .particle{
+  position:absolute;width:3px;height:3px;background:var(--gold);
+  border-radius:50%;opacity:0;animation:floatUp 6s ease-in-out infinite;
+}
+@keyframes floatUp{
+  0%{opacity:0;transform:translateY(20px) scale(.5)}
+  15%{opacity:.35}
+  85%{opacity:.15}
+  100%{opacity:0;transform:translateY(-100vh) scale(1)}
+}
+
+.invite-wrapper{
+  width:100%;max-width:400px;display:flex;flex-direction:column;gap:0;
+  position:relative;z-index:1
+}
+.invite-card{
+  background:linear-gradient(170deg,var(--card) 0%,#1a130b 50%,var(--card) 100%);
+  border:1px solid var(--border);border-radius:18px;overflow:hidden;
+  position:relative;
+  box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 60px rgba(201,169,110,.04),
+    inset 0 1px 0 rgba(232,213,168,.06);
+}
+.invite-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:180px;
+  background:radial-gradient(ellipse at 50% 0%,rgba(201,169,110,.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+/* ===== 顶部装饰线 ===== */
+.card-top{
+  position:relative;height:10px;
+  background:linear-gradient(90deg,
+    transparent 0%, var(--gold-dark) 15%, var(--gold) 50%, var(--gold-dark) 85%, transparent 100%
+  );
+}
+.card-top::after{
+  content:'';position:absolute;left:50%;top:0;transform:translateX(-50%);
+  width:80px;height:4px;background:var(--gold-light);
+  border-radius:0 0 4px 4px;opacity:.7;
+}
+
+/* ===== 头部区域 ===== */
+.card-header{padding:28px 20px 16px;text-align:center;position:relative}
+.title-img{width:200px;height:auto;margin-bottom:6px;animation:titleShine 3s ease-in-out infinite}
+@keyframes titleShine{
+  0%,100%{filter:brightness(1) drop-shadow(0 0 8px rgba(201,169,110,.2))}
+  50%{filter:brightness(1.08) drop-shadow(0 0 16px rgba(201,169,110,.35))}
+}
+
+.theme-title{
+  font-size:28px;color:var(--gold-light);font-weight:700;
+  letter-spacing:10px;margin-bottom:14px;text-indent:10px;
+  text-shadow:0 2px 12px rgba(201,169,110,.25);
+  animation:themeFadeIn .8s ease-out both;
+}
+@keyframes themeFadeIn{
+  from{opacity:0;transform:translateY(12px);letter-spacing:16px}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.event-meta{display:flex;justify-content:center;gap:20px;font-size:13px;color:var(--muted);line-height:1.8}
+.event-meta .meta-item{
+  display:flex;align-items:center;gap:5px;
+  position:relative;
+}
+.event-meta .meta-item::after{
+  content:'';position:absolute;right:-11px;top:50%;width:1px;height:12px;background:var(--border);transform:translateY(-50%)
+}
+.event-meta .meta-item:last-child::after{display:none}
+.meta-icon{font-size:14px;color:var(--gold)}
+
+/* ===== 嘉宾信息 ===== */
+.guest-section{
+  text-align:center;padding:16px 20px 10px;position:relative;
+  animation:guestFadeIn .8s ease-out .2s both;
+}
+@keyframes guestFadeIn{
+  from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}
+}
+.guest-label{font-size:11px;color:var(--muted);letter-spacing:4px;margin-bottom:6px}
+.guest-name{
+  font-size:26px;color:var(--gold-light);font-weight:700;
+  letter-spacing:6px;text-shadow:0 2px 8px rgba(201,169,110,.2)
+}
+.guest-company{font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:1px}
+
+/* ===== 分割线 ===== */
+.divider{
+  display:flex;align-items:center;gap:10px;margin:14px 20px;
+  animation:dividerExpand .6s ease-out .4s both
+}
+.divider::before,.divider::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold-dark),transparent)
+}
+.divider span{font-size:10px;color:var(--muted);letter-spacing:3px;white-space:nowrap}
+@keyframes dividerExpand{from{opacity:0}to{opacity:1}}
+
+/* ===== 活动介绍 ===== */
+.intro-section{padding:0 20px 16px;animation:introSlideIn .8s ease-out .5s both}
+@keyframes introSlideIn{
+  from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}
+}
+.intro-block{
+  background:rgba(201,169,110,.04);border:1px solid rgba(201,169,110,.1);
+  border-radius:10px;padding:14px 16px;margin-bottom:12px;
+}
+.intro-block:last-child{margin-bottom:0}
+.intro-subtitle{
+  font-size:13px;color:var(--gold);font-weight:600;
+  letter-spacing:3px;text-align:center;margin-bottom:10px;
+  position:relative;display:inline-block;left:50%;transform:translateX(-50%);
+}
+.intro-subtitle::before,.intro-subtitle::after{
+  content:'— ';color:var(--gold-dark);font-weight:400;letter-spacing:0
+}
+.intro-text{font-size:12px;color:var(--text);line-height:1.9;letter-spacing:.3px}
+.intro-text .highlight{color:var(--gold-light);font-weight:500}
+.intro-text .emphasis{color:var(--red-light);font-weight:500}
+
+/* ===== 到场凭证 / 二维码 ===== */
+.qr-section{
+  display:flex;flex-direction:column;align-items:center;
+  padding:18px 20px 22px;position:relative;
+  animation:qrFadeIn .8s ease-out .65s both
+}
+@keyframes qrFadeIn{
+  from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}
+}
+.qr-label{
+  font-size:11px;color:var(--muted);letter-spacing:4px;
+  margin-bottom:12px;text-transform:uppercase;
+}
+.qr-label::before{content:'✦ ';color:var(--gold);font-size:9px}
+.qr-label::after{content:' ✦';color:var(--gold);font-size:9px}
+.qr-wrapper{
+  position:relative;width:210px;height:210px;
+  display:flex;align-items:center;justify-content:center;
+  background:#fff;border-radius:12px;padding:10px;
+  box-shadow:0 4px 20px rgba(0,0,0,.3),0 0 30px rgba(201,169,110,.06);
+}
+.qr-wrapper canvas,.qr-wrapper svg,.qr-wrapper img{width:190px!important;height:190px!important;display:block!important}
+.qr-status{margin-top:12px;padding:6px 20px;border-radius:20px;font-size:13px;font-weight:500}
+.qr-status.valid{background:rgba(40,120,40,.12);border:1px solid #2a6020;color:#7ab850}
+.qr-status.used{background:rgba(178,34,34,.12);border:1px solid #5a2020;color:#e06060}
+
+.qr-used-overlay{
+  position:absolute;inset:0;background:rgba(100,100,100,.45);
+  border-radius:12px;display:none;align-items:center;justify-content:center;z-index:10;
+}
+.qr-used-overlay .stamp{
+  font-size:24px;color:#b22222;font-weight:900;transform:rotate(-18deg);
+  text-shadow:0 0 10px rgba(178,34,34,.5);letter-spacing:6px;
+  border:3px solid #b22222;border-radius:10px;padding:6px 16px;
+  background:rgba(178,34,34,.12);
+}
+
+/* ===== 底部联系区 ===== */
+.card-footer{
+  padding:16px 20px 20px;text-align:center;
+  border-top:1px solid var(--border);
+  background:linear-gradient(to top,rgba(201,169,110,.03),transparent);
+  position:relative;
+}
+.phone-row{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-bottom:14px;
+}
+.phone-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  color:var(--gold);font-size:15px;font-weight:600;
+  letter-spacing:1px;text-decoration:none;
+  padding:8px 20px;border:1px solid var(--gold-dark);
+  border-radius:24px;background:rgba(201,169,110,.06);
+  transition:all .3s ease;cursor:pointer;
+}
+.phone-btn:active{background:rgba(201,169,110,.15);transform:scale(.97)}
+.phone-icon{font-size:17px}
+.phone-num{color:var(--gold-light)}
+
+.footer-logo{width:72px;height:auto;opacity:.7;transition:opacity .3s}
+.footer-logo:hover{opacity:1}
+
+/* ===== 加载/错误页 ===== */
+#loadingPage,#errorPage{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:70vh;text-align:center;padding:32px;position:relative;z-index:1
+}
+.loading-spinner{
+  width:36px;height:36px;border:3px solid var(--border);
+  border-top-color:var(--gold);border-radius:50%;
+  animation:spin .8s linear infinite;margin-bottom:16px
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-icon{font-size:48px;margin-bottom:16px}
+.error-text{font-size:15px;color:var(--muted);line-height:1.6}
+
+/* ===== 微光扫过效果 ===== */
+.shimmer-wrap{position:relative;overflow:hidden}
+.shimmer-wrap::after{
+  content:'';position:absolute;top:-50%;left:-60%;width:40%;height:200%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);
+  transform:skewX(-20deg);animation:shimmer 4s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes shimmer{
+  0%{left:-60%}100%{left:160%}
+}
+
+@media(min-width:420px){
+  body{padding:24px 12px}
+  .invite-card{border-radius:20px}
+  .title-img{width:240px}
+  .guest-name{font-size:28px}
+}
+</style>
+</head>
+<body>
+
+<!-- 背景粒子 -->
+<div class="bg-particles" id="particles"></div>
+
+<div id="loadingPage">
+  <div class="loading-spinner"></div>
+  <div style="color:var(--muted);font-size:14px">正在加载邀请函...</div>
+</div>
+
+<div id="errorPage" style="display:none">
+  <div class="error-icon">📄</div>
+  <div class="error-text">邀请函不存在或已失效<br>请确认链接是否正确</div>
+</div>
+
+<!-- 主卡片 -->
+<div class="invite-wrapper" id="invitePage" style="display:none">
+  <div class="invite-card shimmer-wrap">
+
+    <!-- 顶部装饰 -->
+    <div class="card-top"></div>
+
+    <!-- 头部：品牌标题 + 活动主题 + 时间地点 -->
+    <div class="card-header">
+      <img src="title.png" alt="黄金酱酒" class="title-img" onerror="this.style.display='none'">
+      <div class="theme-title">流金之夜</div>
+
+      <div class="event-meta">
+        <div class="meta-item"><span class="meta-icon">📅</span>2026.6.18~6.21</div>
+        <div class="meta-item"><span class="meta-icon">📍</span>高坪万达广场（4/5幢之间）</div>
+      </div>
+    </div>
+
+    <!-- 嘉宾信息 -->
+    <div class="guest-section">
+      <div class="guest-label">诚 邀 嘉 宾</div>
+      <div class="guest-name" id="guestName">—</div>
+      <div class="guest-company" id="guestCompany"></div>
+    </div>
+
+    <div class="divider"><span>邀 请 函 内 容</span></div>
+
+    <!-- 活动介绍 -->
+    <div class="intro-section">
+      <div class="intro-block">
+        <div class="intro-subtitle">流金·入场礼遇</div>
+        <div class="intro-text">
+          到达现场即享<span class="highlight">流金之夜大礼包（价值398元）</span><br>
+          现场签约即享<span class="highlight">新媒体+全域营销赋能计划</span><br>
+          <span class="emphasis">零风险经营承诺书·运营中心兜底保障</span>
+        </div>
+      </div>
+      <div class="intro-block">
+        <div class="intro-subtitle">黄金酱酒·强势入场南充</div>
+        <div class="intro-text">
+          巨人集团酱酒品牌——<span class="highlight">黄金酱酒</span>，携战略大单品、口粮酱酒「<span class="highlight">流金</span>」南充启航<br><br>
+          🚌 <span class="highlight">30辆公交车身广告</span>全城覆盖，日均触达<span class="emphasis">10万+</span>人次<br>
+          🎬 <span class="highlight">40名网红达人</span>（全网粉丝超千万）已完成首轮种草，播放量持续增长<br>
+          💡 酒饮行业首创<span class="emphasis">「新媒体+全域营销」</span>赋能模式，6月18日正式启航<br><br>
+          🔥 限定<span class="emphasis">30席核心合作伙伴</span>，满员即止！
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"><span>到 场 凭 证</span></div>
+
+    <!-- 二维码核销区 -->
+    <div class="qr-section">
+      <div class="qr-label">请向工作人员出示</div>
+      <div class="qr-wrapper" id="qrContainer">
+        <div class="qr-used-overlay" id="qrOverlay">
+          <div class="stamp">已核销</div>
+        </div>
+      </div>
+      <div class="qr-status valid" id="qrStatus">待核验 · 凭此码领取礼品入场</div>
+    </div>
+
+    <!-- 底部：电话 + Logo -->
+    <div class="card-footer">
+      <a href="tel:18990883099" class="phone-btn">
+        <span class="phone-icon">📞</span>
+        <span class="phone-num">18990883099</span>
+      </a>
+      <br>
+      <img src="logo.png" alt="HUANGJIN" class="footer-logo" onerror="this.style.display='none'">
+    </div>
+
+  </div>
+</div>
+
+<!-- qrcode-generator (SVG rendering) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+
+<script>
+// ===== Upstash Redis REST API =====
+const R_URL = 'https://arriving-buck-124112.upstash.io';
+const R_TOK = 'gQAAAAAAAeTQAAIgcDI4NmZiZGVkZTQzMzI0MDcwYjAxMjZhOTE1MTc3MTA0MA';
+
+async function redis(path){
+  const r = await fetch(R_URL+path,{headers:{Authorization:'Bearer '+R_TOK}});
+  const j = await r.json();
+  if(typeof j.result==='string'){try{return JSON.parse(j.result);}catch{return j.result;}}
+  return j.result;
+}
+
+let inviteId='',pollTimer=null,currentUsed=false;
+
+// ===== 背景粒子 =====
+function initParticles(){
+  const c=document.getElementById('particles');
+  for(let i=0;i<18;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    p.style.left=Math.random()*100+'%';
+    p.style.bottom='-10px';
+    p.style.width=(2+Math.random()*3)+'px';
+    p.style.height=p.style.width;
+    p.style.animationDuration=(4+Math.random()*5)+'s';
+    p.style.animationDelay=(Math.random()*6)+'s';
+    c.appendChild(p);
+  }
+}
+initParticles();
+
+function init(){
+  const params=new URLSearchParams(window.location.search);
+  inviteId=params.get('id');
+  if(!inviteId)return showError();
+  loadInvite();
+  pollTimer=setInterval(loadInvite,3000);
+}
+
+async function loadInvite(){
+  if(inviteId==='demo'){
+    renderInvite({id:'HJDEMO',name:'尊贵嘉宾',company:'演示公司',used:false});
+    document.getElementById('loadingPage').style.display='none';
+    document.getElementById('invitePage').style.display='flex';
+    return;
+  }
+  try{
+    const data=await redis('/get/invite:'+encodeURIComponent(inviteId));
+    if(!data)return showError();
+    renderInvite(data);
+  }catch(e){console.warn('loadInvite error:',e);}
+}
+
+function renderInvite(data){
+  document.getElementById('loadingPage').style.display='none';
+  document.getElementById('invitePage').style.display='flex';
+
+  document.getElementById('guestName').textContent=data.name;
+  document.getElementById('guestCompany').textContent=data.company||'';
+
+  if(!window.__qrRendered){renderQR(data.id);window.__qrRendered=true;}
+
+  if(data.used&&!currentUsed){
+    currentUsed=true;showVerifiedState();
+  }
+}
+
+function showVerifiedState(){
+  document.getElementById('qrOverlay').style.display='flex';
+  const st=document.getElementById('qrStatus');
+  st.className='qr-status used';
+  st.textContent='已核销 · 礼品已领取';
+  if(pollTimer){clearInterval(pollTimer);pollTimer=null;}
+}
+
+function renderQR(text){
+  const container=document.getElementById('qrContainer');
+  if(typeof qrcode==='function'){
+    try{
+      const qr=qrcode(0,'H');
+      qr.addData(text);qr.make();
+      container.innerHTML=qr.createSvgTag(6);
+      const svg=container.querySelector('svg');
+      if(svg){svg.style.width='190px';svg.style.height='190px';svg.style.display='block';}
+      // Re-add overlay
+      const ov=document.createElement('div');
+      ov.className='qr-used-overlay';ov.id='qrOverlay';
+      ov.innerHTML='<div class="stamp">已核销</div>';
+      container.appendChild(ov);
+      return;
+    }catch(e){console.warn('QR SVG failed:',e);}
+  }
+  container.innerHTML='';
+  const fb=document.createElement('div');
+  fb.style.cssText='padding:20px;text-align:center;color:var(--gold);font-size:18px;letter-spacing:4px;font-weight:600';
+  fb.textContent=text;
+  container.appendChild(fb);
+  const ov=document.createElement('div');
+  ov.className='qr-used-overlay';ov.id='qrOverlay';
+  ov.innerHTML='<div class="stamp">已核销</div>';
+  container.appendChild(ov);
+}
+
+function showError(){
+  document.getElementById('loadingPage').style.display='none';
+  document.getElementById('errorPage').style.display='flex';
+  if(pollTimer){clearInterval(pollTimer);pollTimer=null;}
+}
+
+init();
+</script>
+</body>
+</html>
