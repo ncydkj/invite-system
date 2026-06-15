@@ -179,18 +179,17 @@ async function redisGet(path) {
   return j.result;
 }
 
-// Robust redis SET via POST (avoids URL encoding issues)
+// Robust redis SET via POST raw body (avoids URL encoding issues)
 async function redisSet(key, value) {
   const url = R_URL + '/set/' + key;
-  const body = new URLSearchParams();
-  body.append('value', JSON.stringify(value));
+  const rawBody = JSON.stringify(value);
   const r = await fetch(url, {
     method: 'POST',
     headers: {
       Authorization: 'Bearer ' + R_TOK,
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': 'text/plain'
     },
-    body: body
+    body: rawBody
   });
   const j = await r.json();
   console.log('[redisSet]', key, j);
