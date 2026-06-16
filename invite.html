@@ -393,13 +393,11 @@ async function loadInvite(){
   }
   try{
     const raw = await redis('/get/invite:'+encodeURIComponent(inviteId));
-    console.log('[loadInvite] id:',inviteId,'raw:',raw,'type:',typeof raw);
-    document.getElementById('debugInfo').textContent='ID:'+inviteId+' | data:'+JSON.stringify(raw).slice(0,200)+' | type:'+typeof raw;
+    console.log('[loadInvite] id:',inviteId);
     if(!raw||typeof raw!=='object')return showError();
     renderInvite(raw);
   }catch(e){
     console.error('loadInvite error:',e);
-    document.getElementById('debugInfo').textContent='ERROR:'+e.message;
     showError();
   }
 }
@@ -462,6 +460,5 @@ function showError(){
 
 init();
 </script>
-<div id="debugInfo" style="position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.9);color:#0f0;font-size:11px;padding:4px 8px;z-index:9999;word-break:break-all;font-family:monospace;"></div>
 </body>
 </html>
