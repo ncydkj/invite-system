@@ -377,7 +377,9 @@ async function deleteInvite(id) {
 }
 
 function copyLink(id) {
-  const url = window.location.origin + '/invite.html?id=' + id;
+  // 自动计算 basePath，兼容 GitHub Pages 子路径 /invite-system/ 和根路径部署
+  const basePath = window.location.pathname.replace(/\/admin\.html.*$/, '');
+  const url = window.location.origin + basePath + '/invite.html?id=' + id;
   if (navigator.clipboard) {
     navigator.clipboard.writeText(url).then(() => showToast('✅ 链接已复制'));
   } else {
